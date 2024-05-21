@@ -30,7 +30,8 @@ def create_item():
     data = request.json
     new_item = {
         'id': len(items) + 1,
-        'name': data['name']
+        'name': data['name'],
+        'isActive': True 
     }
     items.append(new_item)
     save_data()  # Save data to JSON file
@@ -40,21 +41,36 @@ def create_item():
 @items_bp.route('/items/<int:item_id>', methods=['DELETE'])
 def delete_item(item_id):
     item = find_item_by_id(item_id)
+
+
     if item:
         items.remove(item)
         save_data()  # Save data to JSON file
         return '', 204
+    
+
     else:
         return jsonify({'error': 'Item not found'}), 404
 
 # PUT /api/items/{id}
 @items_bp.route('/items/<int:item_id>', methods=['PUT'])
 def update_item(item_id):
+
+
     item = find_item_by_id(item_id)
+
+
     if item:
+        oldItem = item
         data = request.json
         item['name'] = data['name']
+        item['status'] = 'updated'
+
         save_data()  # Save data to JSON file
-        return jsonify(item), 200
+        
+        return jsonify({
+            'newItem' : item,
+            'oldItem' : oldItem
+                       }),200
     else:
         return jsonify({'error': 'Item not found'}), 404
